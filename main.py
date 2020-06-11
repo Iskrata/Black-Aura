@@ -89,8 +89,13 @@ class Player(object):
         self.width = width
         self.height = height
         self.vel = 5
-        self.isJump = False
+        self.isBoost = False
         self.jumpCount = 10
+        self.hitbox = (self.x, self.y, self.width, self.height)
+
+    def draw(self, screen):
+        self.hitbox = (self.x, self.y, self.width, self.height)
+        pygame.draw.rect(screen, white, self.hitbox)
 
 class Obstacle():
     def __init__(self):
@@ -98,7 +103,9 @@ class Obstacle():
         self.x, self.y = self.dire()
         self.width = 10
         self.height = 10
-        self.vel = 5      
+        self.vel = 5  
+        self.hitbox = (self.x, self.y, self.width, self.height)
+
     def dire(self):
         if self.type == 1:
             return 0, random.randint(0, SCREEN_HEIGHT)
@@ -118,43 +125,55 @@ class Obstacle():
         if self.type == 4:
             self.y -= self.vel
     def draw(self, screen):
-        pygame.draw.rect(screen, white, (self.x, self.y, self.width, self.height))
+        self.hitbox = (self.x, self.y, self.width, self.height)
+        pygame.draw.rect(screen, white, self.hitbox)
 
 
 def game():
-    man = Player(10, 500, 100, 100)
-    s = Obstacle()
     running = True
+    man = Player(10, 500, 100, 100)
+    enemies = []
+    points = 0
 
-    obs = False
-    ox = SCREEN_WIDTH-10
-    oy = SCREEN_HEIGHT/2
+    def redraw_win():
+        screen.fill((50, 50, 50))
+        for e in enemies:
+            e.draw(screen)
+        man.draw(screen)
+        pygame.display.update()
+
+
     while running:
 
-        screen.fill((50, 50, 50))
-
-        pygame.draw.rect(screen, white, (man.x, man.y, man.width, man.height))
+        redraw_win()
 
         keys = pygame.key.get_pressed()
 
-        rand = random.randint(1, 5)
-        if rand == 4 or obs == True:
-            pass    
-        s.draw(screen)
-        s.move()
-
+        if len(enemies) == 0:
+            points += 1
+            for _ in range(points*2):
+                enemy = Obstacle()
+                enemies.append(enemy)
+        
+        for e in enemies[:]:
+            e.move()
+            r = pygame.Rect(man.hitbox)
+            if r.collidepoint(e.x, e.y):
+                running = False
+            if not(e.x < SCREEN_WIDTH+e.width and e.x > 0-e.width and e.y < SCREEN_HEIGHT+e.height and e.y > 0-e.height):
+                enemies.remove(e)
 
         if keys[pygame.K_LEFT] and man.x > man.vel:
             man.x -= man.vel
         if keys[pygame.K_RIGHT] and man.x < SCREEN_WIDTH - man.width - man.vel:
             man.x += man.vel
-        if not(man.isJump):
+        if not(man.isBoost):
             if keys[pygame.K_UP] and man.y > man.vel:
                 man.y -= man.vel
             if keys[pygame.K_DOWN] and man.y < SCREEN_HEIGHT - man.height - man.vel:
                 man.y += man.vel
             if keys[pygame.K_SPACE]:
-                man.isJump = True
+                man.isBoost = True
         else:
             if man.jumpCount >=  -10:
                 neg = 1
@@ -163,7 +182,7 @@ def game():
                 man.y -= (man.jumpCount ** 2) * 0.5 * neg
                 man.jumpCount -= 1
             else:
-                man.isJump = False
+                man.isBoost = False
                 man.jumpCount = 10
 
         for event in pygame.event.get():
@@ -173,8 +192,15 @@ def game():
                 if event.key == pygame.K_ESCAPE:
                     running = False
 
-        pygame.display.update()
         mainClock.tick(60)
 
 
+
+
 main_menu()
+
+# TODO 
+# Score count on the screen
+# Boost
+# Other power up (Ex. Slow time)
+# Loose screen
