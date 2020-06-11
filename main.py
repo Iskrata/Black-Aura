@@ -15,8 +15,8 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
 bg_im = pygame.image.load("data\\images\\ms_bg.png")
 bg_im_inv = pygame.image.load("data\\images\\ms_bg_inv.png")
+bg_es = pygame.image.load("data\\images\\es_bg.png")
 
-font =  pygame.font.SysFont(None, 60)
 font = pygame.font.Font("data\\fonts\\MonospaceBold.ttf", 40)
 
 black = (0, 0, 0)
@@ -45,22 +45,18 @@ def main_menu():
             screen.blit(bg_im_inv, (0, 0))
             button = pygame.Rect(draw_text('[Start Game]', font, black, screen, 0, 600, True))
         else:
-        #print(pygame.time.get_ticks())
             screen.blit(bg_im, (0, 0))
             button = pygame.Rect(draw_text('[Start Game]', font, white, screen, 0, 600, True))
 
         mx, my = pygame.mouse.get_pos(475, 600, 200, 50)
 
-        #button = pygame.Rect(475, 600, 200, 100)
 
         if button.collidepoint((mx, my)):
             if click:
                 game()
             else:
-                pass
                 pygame.draw.rect(screen, (255, 255, 255), button) 
                 draw_text('[Start Game]', font, (0, 0, 0), screen, 0, 600, True)
-        #pygame.draw.rect(screen, (255, 0, 0), button) 
 
 
         click = False
@@ -79,8 +75,8 @@ def main_menu():
         pygame.display.update()
         mainClock.tick(60)
 
-def end_screen():
-    screen.fill((0, 255, 0))
+def end_screen(points):
+    screen.fill(black)
 
 class Player(object):
     def __init__(self, x, y, width, height):
@@ -90,7 +86,6 @@ class Player(object):
         self.height = height
         self.vel = 5
         self.isBoost = False
-        self.jumpCount = 10
         self.hitbox = (self.x, self.y, self.width, self.height)
 
     def draw(self, screen):
@@ -131,7 +126,7 @@ class Obstacle():
 
 def game():
     running = True
-    man = Player(10, 500, 100, 100)
+    man = Player((SCREEN_WIDTH/2)-50, SCREEN_HEIGHT/2, 100, 100)
     enemies = []
     points = 0
 
@@ -140,6 +135,10 @@ def game():
         for e in enemies:
             e.draw(screen)
         man.draw(screen)
+
+        points_label = font.render(f"Points: {points}", 1, white)
+        screen.blit(points_label, (SCREEN_WIDTH - points_label.get_width() - 10, 10))
+
         pygame.display.update()
 
 
@@ -167,24 +166,13 @@ def game():
             man.x -= man.vel
         if keys[pygame.K_RIGHT] and man.x < SCREEN_WIDTH - man.width - man.vel:
             man.x += man.vel
-        if not(man.isBoost):
-            if keys[pygame.K_UP] and man.y > man.vel:
-                man.y -= man.vel
-            if keys[pygame.K_DOWN] and man.y < SCREEN_HEIGHT - man.height - man.vel:
-                man.y += man.vel
-            if keys[pygame.K_SPACE]:
-                man.isBoost = True
-        else:
-            if man.jumpCount >=  -10:
-                neg = 1
-                if man.jumpCount < 0:
-                    neg = -1
-                man.y -= (man.jumpCount ** 2) * 0.5 * neg
-                man.jumpCount -= 1
-            else:
-                man.isBoost = False
-                man.jumpCount = 10
-
+        if keys[pygame.K_UP] and man.y > man.vel:
+            man.y -= man.vel
+        if keys[pygame.K_DOWN] and man.y < SCREEN_HEIGHT - man.height - man.vel:
+            man.y += man.vel
+        if keys[pygame.K_SPACE]:
+            man.isBoost = True
+    
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -194,6 +182,7 @@ def game():
 
         mainClock.tick(60)
 
+    end_screen(points)
 
 
 
@@ -204,3 +193,4 @@ main_menu()
 # Boost
 # Other power up (Ex. Slow time)
 # Loose screen
+# Make fency bg
