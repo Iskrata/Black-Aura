@@ -48,7 +48,7 @@ def main_menu():
             screen.blit(bg_im, (0, 0))
             button = pygame.Rect(draw_text('[Start Game]', font, white, screen, 0, 600, True))
 
-        mx, my = pygame.mouse.get_pos(475, 600, 200, 50)
+        mx, my = pygame.mouse.get_pos()
 
 
         if button.collidepoint((mx, my)):
@@ -76,7 +76,38 @@ def main_menu():
         mainClock.tick(60)
 
 def end_screen(points):
-    screen.fill(black)
+    inEnd = True
+    click = False
+    while inEnd:
+        screen.blit(bg_es, (0, 0))
+        button = pygame.Rect(draw_text('[Main Menu]', font, white, screen, 0, 650, True))
+        pygame.Rect(draw_text(f'[Points] // {points}', font, white, screen, 0, 600, True))
+
+        mx, my = pygame.mouse.get_pos()
+
+        if button.collidepoint((mx, my)):
+            if click:
+                inEnd = False
+            else:
+                pygame.draw.rect(screen, white, button) 
+                draw_text('[Main Menu]', font, black, screen, 0, 650, True)
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    inEnd = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.display.update()
+        mainClock.tick(60)
+    
+    main_menu()
 
 class Player(object):
     def __init__(self, x, y, width, height):
