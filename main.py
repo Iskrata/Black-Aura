@@ -188,7 +188,7 @@ def game():
         for e in enemies[:]:
             e.move()
             r = pygame.Rect(man.hitbox)
-            if r.collidepoint(e.x, e.y):
+            if r.collidepoint(e.x + e.width/2, e.y + e.height/2):
                 running = False
             if not(e.x < SCREEN_WIDTH+e.width and e.x > 0-e.width and e.y < SCREEN_HEIGHT+e.height and e.y > 0-e.height):
                 enemies.remove(e)
