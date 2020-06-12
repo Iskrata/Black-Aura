@@ -193,13 +193,13 @@ def game():
             if not(e.x < SCREEN_WIDTH+e.width and e.x > 0-e.width and e.y < SCREEN_HEIGHT+e.height and e.y > 0-e.height):
                 enemies.remove(e)
 
-        if keys[pygame.K_LEFT] and man.x > man.vel:
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and man.x > man.vel:
             man.x -= man.vel
-        if keys[pygame.K_RIGHT] and man.x < SCREEN_WIDTH - man.width - man.vel:
+        if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and man.x < SCREEN_WIDTH - man.width - man.vel:
             man.x += man.vel
-        if keys[pygame.K_UP] and man.y > man.vel:
+        if (keys[pygame.K_UP] or keys[pygame.K_w]) and man.y > man.vel:
             man.y -= man.vel
-        if keys[pygame.K_DOWN] and man.y < SCREEN_HEIGHT - man.height - man.vel:
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and man.y < SCREEN_HEIGHT - man.height - man.vel:
             man.y += man.vel
         if keys[pygame.K_SPACE]:
             man.isBoost = True
