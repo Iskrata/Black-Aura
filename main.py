@@ -19,22 +19,23 @@ bg_es = pygame.image.load("data\\images\\es_bg.png")
 
 font = pygame.font.Font("data\\fonts\\MonospaceBold.ttf", 40)
 
-black = (0, 0, 0)
-white = (255, 255, 255)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
-def draw_text(text, font, color, surface, x, y, center):
+def draw_text(text, font, color, surface, x, y, is_centered):
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
-    if center:
-        textrect.topleft = ((SCREEN_WIDTH/2)-(textrect.width/2), y)
+    if is_centered:
+        textrect.topleft = (int((SCREEN_WIDTH/2)-(textrect.width/2)), y)
     else:
         textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
-    return (SCREEN_WIDTH/2)-(textrect.width/2), y, textrect.width, textrect.height
+    return int((SCREEN_WIDTH/2)-(textrect.width/2)), y, textrect.width, textrect.height
 
 def main_menu():
     click = False
     frame = False
+
     while True:
         if pygame.time.get_ticks() % 300 == 0 or frame == True:
             if not frame:
@@ -43,10 +44,10 @@ def main_menu():
             if pygame.time.get_ticks() > tm+random.randint(200,1000):
                 frame = False
             screen.blit(bg_im_inv, (0, 0))
-            button = pygame.Rect(draw_text('[Start Game]', font, black, screen, 0, 600, True))
+            button = pygame.Rect(draw_text('[Start Game]', font, BLACK, screen, 0, 600, True))
         else:
             screen.blit(bg_im, (0, 0))
-            button = pygame.Rect(draw_text('[Start Game]', font, white, screen, 0, 600, True))
+            button = pygame.Rect(draw_text('[Start Game]', font, WHITE, screen, 0, 600, True))
 
         mx, my = pygame.mouse.get_pos()
 
@@ -76,12 +77,13 @@ def main_menu():
         mainClock.tick(60)
 
 def end_screen(points):
+
     inEnd = True
     click = False
     while inEnd:
         screen.blit(bg_es, (0, 0))
-        button = pygame.Rect(draw_text('[Main Menu]', font, white, screen, 0, 650, True))
-        pygame.Rect(draw_text(f'[Points] // {points}', font, white, screen, 0, 600, True))
+        button = pygame.Rect(draw_text('[Main Menu]', font, WHITE, screen, 0, 650, True))
+        pygame.Rect(draw_text(f'[Points] // {points}', font, WHITE, screen, 0, 600, True))
 
         mx, my = pygame.mouse.get_pos()
 
@@ -89,8 +91,8 @@ def end_screen(points):
             if click:
                 inEnd = False
             else:
-                pygame.draw.rect(screen, white, button) 
-                draw_text('[Main Menu]', font, black, screen, 0, 650, True)
+                pygame.draw.rect(screen, WHITE, button) 
+                draw_text('[Main Menu]', font, BLACK, screen, 0, 650, True)
 
         click = False
         for event in pygame.event.get():
@@ -121,7 +123,8 @@ class Player(object):
 
     def draw(self, screen):
         self.hitbox = (self.x, self.y, self.width, self.height)
-        pygame.draw.rect(screen, white, self.hitbox)
+        pygame.draw.rect(screen, WHITE, self.hitbox)
+        pygame.draw.rect(screen, (50, 50, 50), (self.x+25, self.y+25, self.width/2, self.height/2))
 
 class Obstacle():
     def __init__(self):
@@ -152,10 +155,15 @@ class Obstacle():
             self.y -= self.vel
     def draw(self, screen):
         self.hitbox = (self.x, self.y, self.width, self.height)
-        pygame.draw.rect(screen, white, self.hitbox)
+        pygame.draw.rect(screen, WHITE, self.hitbox)
 
 
 def game():
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load('data\\music\\ingame.mp3')
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.1)
+
     running = True
     man = Player((SCREEN_WIDTH/2)-50, SCREEN_HEIGHT/2, 100, 100)
     enemies = []
@@ -167,7 +175,7 @@ def game():
             e.draw(screen)
         man.draw(screen)
 
-        points_label = font.render(f"Points: {points}", 1, white)
+        points_label = font.render(f"Points: {points}", 1, WHITE)
         screen.blit(points_label, (SCREEN_WIDTH - points_label.get_width() - 10, 10))
 
         pygame.display.update()
@@ -189,6 +197,9 @@ def game():
             e.move()
             r = pygame.Rect(man.hitbox)
             if r.collidepoint(e.x + e.width/2, e.y + e.height/2):
+                pygame.mixer.music.stop()
+                pygame.mixer.music.load('data\\music\\pop.mp3')
+                pygame.mixer.music.play(1)
                 running = False
             if not(e.x < SCREEN_WIDTH+e.width and e.x > 0-e.width and e.y < SCREEN_HEIGHT+e.height and e.y > 0-e.height):
                 enemies.remove(e)
@@ -220,8 +231,7 @@ def game():
 main_menu()
 
 # TODO 
-# Score count on the screen
-# Boost
-# Other power up (Ex. Slow time)
-# Loose screen
+# record
+# gravity mode
 # Make fency bg
+# readme
