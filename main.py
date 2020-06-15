@@ -117,7 +117,8 @@ class Player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 5
+        self.velx = 0
+        self.vely = 0
         self.isBoost = False
         self.hitbox = (self.x, self.y, self.width, self.height)
 
@@ -204,16 +205,36 @@ def game():
             if not(e.x < SCREEN_WIDTH+e.width and e.x > 0-e.width and e.y < SCREEN_HEIGHT+e.height and e.y > 0-e.height):
                 enemies.remove(e)
 
-        if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and man.x > man.vel:
-            man.x -= man.vel
-        if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and man.x < SCREEN_WIDTH - man.width - man.vel:
-            man.x += man.vel
-        if (keys[pygame.K_UP] or keys[pygame.K_w]) and man.y > man.vel:
-            man.y -= man.vel
-        if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and man.y < SCREEN_HEIGHT - man.height - man.vel:
-            man.y += man.vel
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]):
+            if man.velx > -7:
+                man.velx -= 0.2
+        if (keys[pygame.K_RIGHT] or keys[pygame.K_d]):
+            if man.velx  < 7:
+                man.velx += 0.2
+        if (keys[pygame.K_UP] or keys[pygame.K_w]):
+            if man.vely > -7:
+                man.vely -= 0.2
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]):
+            if man.vely < 7:
+                man.vely += 0.2
         if keys[pygame.K_SPACE]:
             man.isBoost = True
+
+        if man.x + man.velx > 5 and man.x + 5 < SCREEN_WIDTH - man.width - man.velx and man.y + man.vely > 5 and man.y + 5 < SCREEN_HEIGHT - man.height - man.vely:
+            man.x += man.velx
+            man.y += man.vely
+        else:
+            man.velx = 0
+            man.vely = 0
+
+        if man.velx < 0:
+            man.velx += 0.1
+        if man.velx > 0:
+            man.velx -= 0.1
+        if man.vely < 0:
+            man.vely += 0.1
+        if man.vely > 0:
+            man.vely -= 0.1
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -233,5 +254,4 @@ main_menu()
 # TODO 
 # record
 # gravity mode
-# Make fency bg
 # readme
