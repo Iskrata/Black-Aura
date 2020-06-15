@@ -1,7 +1,8 @@
 # Black Aura
 The main object of the game is to avoid the obstacles and keep the score up!
 
-![Screenshot](data\images\preview_1.png)
+![Screenshot](https://github.com/Iskrata/Black-Aura/blob/master/data/images/preview_1.png)
+
 
 ### Summary
 - You move using WSAD
@@ -13,5 +14,5 @@ The main object of the game is to avoid the obstacles and keep the score up!
 ### Obstacle Generation
 - The obstacles that are generated are x2 the score and they spawn at random positions.
 
-![Screenshot](data\images\preview_2.png)
+![Screenshot](https://github.com/Iskrata/Black-Aura/blob/master/data/images/preview_2.png)
 ---
