@@ -1,9 +1,9 @@
 import pygame 
 import sys
 import random
+import json
 
 mainClock = pygame.time.Clock()
-from pygame.locals import *
 
 pygame.init()
 
@@ -22,6 +22,8 @@ font = pygame.font.Font("data\\fonts\\MonospaceBold.ttf", 40)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+physics = True
+
 def draw_text(text, font, color, surface, x, y, is_centered):
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
@@ -35,7 +37,7 @@ def draw_text(text, font, color, surface, x, y, is_centered):
 def main_menu():
     click = False
     frame = False
-
+    global physics
     while True:
         if pygame.time.get_ticks() % 300 == 0 or frame == True:
             if not frame:
@@ -51,13 +53,30 @@ def main_menu():
 
         mx, my = pygame.mouse.get_pos()
 
+        if not physics:
+            button2 = pygame.Rect(draw_text('[Physics] = OFF', font, WHITE, screen, 0, 650, True))
+        if physics:
+            button2 = pygame.Rect(draw_text('[Physics] = ON', font, WHITE, screen, 0, 650, True))
 
         if button.collidepoint((mx, my)):
             if click:
                 game()
             else:
-                pygame.draw.rect(screen, (255, 255, 255), button) 
-                draw_text('[Start Game]', font, (0, 0, 0), screen, 0, 600, True)
+                pygame.draw.rect(screen, WHITE, button) 
+                draw_text('[Start Game]', font, BLACK, screen, 0, 600, True)
+
+        if button2.collidepoint((mx, my)):
+            if click:
+                if physics:
+                    physics = False
+                else:
+                    physics = True
+            else:
+                pygame.draw.rect(screen, WHITE, button2) 
+                if not physics:
+                    button2 = pygame.Rect(draw_text('[Physics] = OFF', font, BLACK, screen, 0, 650, True))
+                if physics:
+                    button2 = pygame.Rect(draw_text('[Physics] = ON', font, BLACK, screen, 0, 650, True))
 
 
         click = False
@@ -165,6 +184,7 @@ def game():
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(0.1)
 
+    global physics
     running = True
     man = Player((SCREEN_WIDTH/2)-50, SCREEN_HEIGHT/2, 100, 100)
     enemies = []
@@ -206,17 +226,29 @@ def game():
                 enemies.remove(e)
 
         if (keys[pygame.K_LEFT] or keys[pygame.K_a]):
-            if man.velx > -7:
-                man.velx -= 0.2
+            if physics:
+                if man.velx > -7:
+                    man.velx -= 0.2
+            else:
+                man.velx = -5
         if (keys[pygame.K_RIGHT] or keys[pygame.K_d]):
-            if man.velx  < 7:
-                man.velx += 0.2
+            if physics:
+                if man.velx  < 7:
+                    man.velx += 0.2
+            else: 
+                man.velx = 5
         if (keys[pygame.K_UP] or keys[pygame.K_w]):
-            if man.vely > -7:
-                man.vely -= 0.2
+            if physics:
+                if man.vely > -7:
+                    man.vely -= 0.2
+            else:
+                man.vely = -5
         if (keys[pygame.K_DOWN] or keys[pygame.K_s]):
-            if man.vely < 7:
-                man.vely += 0.2
+            if physics:
+                if man.vely < 7:
+                    man.vely += 0.2
+            else:
+                man.vely = 5
         if keys[pygame.K_SPACE]:
             man.isBoost = True
 
@@ -227,15 +259,19 @@ def game():
             man.velx = 0
             man.vely = 0
 
-        if man.velx < 0:
-            man.velx += 0.1
-        if man.velx > 0:
-            man.velx -= 0.1
-        if man.vely < 0:
-            man.vely += 0.1
-        if man.vely > 0:
-            man.vely -= 0.1
-    
+        if physics:
+            if man.velx < 0:
+                man.velx += 0.1
+            if man.velx > 0:
+                man.velx -= 0.1
+            if man.vely < 0:
+                man.vely += 0.1
+            if man.vely > 0:
+                man.vely -= 0.1
+        else:
+            man.velx = 0
+            man.vely = 0
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -250,8 +286,3 @@ def game():
 
 
 main_menu()
-
-# TODO 
-# record
-# gravity mode
-# readme
